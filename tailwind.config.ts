@@ -1,8 +1,8 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: 'class', // 👈 TOTO JE DŮLEŽITÉ
   content: [
-    // Tady říkáme Tailwindu: "Prohledej všechny soubory ve složce app"
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",

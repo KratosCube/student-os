@@ -22,11 +22,9 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
   useEffect(() => {
     audioRef.current = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
     
-    // Načtení z localStorage
     const savedSubject = localStorage.getItem('timerSubject');
     if (savedSubject) setSelectedSubjectId(savedSubject);
 
-    // Pokud běžel časovač, dopočítáme rozdíl
     const savedTarget = localStorage.getItem('timerTarget');
     if (savedTarget) {
       const targetTime = parseInt(savedTarget, 10);
@@ -39,13 +37,11 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
       } else {
         localStorage.removeItem('timerTarget');
         setTimeLeft(0);
-        // Tady nespouštíme finishTimer hned, aby se nezacyklil render,
-        // necháme to na efektu níže (bod 3)
       }
     }
   }, []);
 
-  // 2. TIKÁNÍ (Jen odečítá čas, nic jiného nedělá)
+  // 2. TIKÁNÍ
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -60,8 +56,7 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
     };
   }, [isActive, timeLeft]);
 
-  // 3. DETEKCE KONCE (Tohle je ta oprava!)
-  // Tento efekt čeká, až se timeLeft změní. Pokud je 0 a bylo to aktivní, ukončí to.
+  // 3. DETEKCE KONCE
   useEffect(() => {
     if (timeLeft === 0 && isActive) {
       finishTimer();
@@ -70,17 +65,14 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
   }, [timeLeft, isActive]); 
 
 
-  // Funkce pro dokončení
   const finishTimer = async () => {
-    setIsActive(false); // Zastavíme
+    setIsActive(false);
     localStorage.removeItem('timerTarget');
     
-    // Pípnutí 🔔
     if (audioRef.current) {
       audioRef.current.play().catch(e => console.log("Audio chyba", e));
     }
 
-    // Uložení do DB (Server Action)
     if (mode === 'work' && selectedSubjectId) {
       try {
         await logStudySession(parseInt(selectedSubjectId), 25);
@@ -90,8 +82,6 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
     }
 
     alert(mode === 'work' ? "Hotovo! 🥳 Dej si pauzu." : "Pauza končí! 🚀 Zpátky do práce.");
-    
-    // Reset pro další kolo
     resetTimer(false); 
   };
 
@@ -131,13 +121,18 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
 
   return (
     <div className={`p-6 rounded-2xl shadow-sm border transition-colors ${
-      mode === 'work' ? 'bg-white border-indigo-100' : 'bg-emerald-50 border-emerald-100'
+      mode === 'work' 
+        ? 'bg-white dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/30' 
+        : 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-900/50'
     }`}>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="font-bold text-slate-700 flex items-center gap-2">
+        <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
           {mode === 'work' ? '🧠 Focus Mode' : '☕ Pauza'}
         </h3>
-        <button onClick={switchMode} className="text-xs px-2 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium">
+        <button 
+          onClick={switchMode} 
+          className="text-xs px-2 py-1 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+        >
           {mode === 'work' ? 'Přepnout na Pauzu' : 'Přepnout na Práci'}
         </button>
       </div>
@@ -147,7 +142,7 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
           <select 
             value={selectedSubjectId}
             onChange={(e) => setSelectedSubjectId(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm rounded-lg p-2.5 focus:ring-indigo-500 focus:border-indigo-500"
             disabled={isActive}
           >
             <option value="">-- Vyber předmět --</option>
@@ -158,7 +153,7 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
         </div>
       )}
 
-      <div className="text-6xl font-mono font-bold text-center mb-8 text-slate-800 tracking-tighter">
+      <div className="text-6xl font-mono font-bold text-center mb-8 text-slate-800 dark:text-slate-100 tracking-tighter">
         {formatTime(timeLeft)}
       </div>
 
@@ -167,8 +162,11 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
           onClick={toggleTimer}
           disabled={mode === 'work' && !selectedSubjectId && !isActive}
           className={`px-8 py-3 rounded-xl text-white font-bold text-lg shadow-lg transition-transform active:scale-95 flex items-center gap-2 ${
-            isActive ? 'bg-amber-500 hover:bg-amber-600' : 
-            (!selectedSubjectId && mode === 'work') ? 'bg-slate-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
+            isActive 
+              ? 'bg-amber-500 hover:bg-amber-600' 
+              : (!selectedSubjectId && mode === 'work') 
+                ? 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed' 
+                : 'bg-indigo-600 hover:bg-indigo-700'
           }`}
         >
           {isActive ? <><Pause size={20}/> Pauza</> : <><Play size={20}/> Start</>}
@@ -176,14 +174,14 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
         
         <button 
           onClick={() => resetTimer(true)}
-          className="p-3 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+          className="p-3 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
         >
           <RotateCcw size={24} />
         </button>
       </div>
 
       {!selectedSubjectId && mode === 'work' && (
-        <p className="text-center text-xs text-rose-500 mt-4 font-medium">
+        <p className="text-center text-xs text-rose-500 dark:text-rose-400 mt-4 font-medium">
           ⚠️ Vyber předmět pro start.
         </p>
       )}

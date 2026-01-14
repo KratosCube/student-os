@@ -87,21 +87,21 @@ export default function HydrationTracker() {
   if (!isMounted) return null;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col items-center relative overflow-hidden group h-full">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center relative overflow-hidden group h-full transition-colors">
       
       <div className="flex justify-between w-full mb-4 z-10 relative items-start">
         <div>
-          <h3 className="font-bold text-slate-700 flex items-center gap-2">
+          <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
             <Droplets className="w-5 h-5 text-sky-500" />
             Voda
           </h3>
           {!showSettings && (
-             <p className="text-xs text-slate-400 mt-1 font-medium">Dnes: <span className="text-sky-600 font-bold">{totalMl} ml</span></p>
+             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 font-medium">Dnes: <span className="text-sky-600 dark:text-sky-400 font-bold">{totalMl} ml</span></p>
           )}
         </div>
         <button 
           onClick={() => setShowSettings(!showSettings)}
-          className="text-slate-300 hover:text-sky-500 transition-colors p-1"
+          className="text-slate-300 dark:text-slate-600 hover:text-sky-500 dark:hover:text-sky-400 transition-colors p-1"
         >
           <Settings className="w-4 h-4" />
         </button>
@@ -110,33 +110,33 @@ export default function HydrationTracker() {
       {showSettings ? (
         <div className="w-full flex-1 flex flex-col justify-center animate-in fade-in space-y-3">
            <div>
-             <label className="text-xs font-bold text-slate-400 uppercase mb-1 block">Interval (minuty)</label>
+             <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 block">Interval (minuty)</label>
              <input 
                type="number" 
                value={intervalMinutes}
                onChange={(e) => setIntervalMinutes(parseInt(e.target.value) || 1)}
-               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500"
+               className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500"
              />
            </div>
            <div>
-             <label className="text-xs font-bold text-slate-400 uppercase mb-1 block">Velikost sklenice (ml)</label>
+             <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 block">Velikost sklenice (ml)</label>
              <input 
                type="number" 
                value={glassSize}
                onChange={(e) => setGlassSize(parseInt(e.target.value) || 0)}
-               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500"
+               className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500"
              />
            </div>
            <button 
              onClick={saveSettings}
-             className="w-full bg-sky-500 text-white rounded-xl py-2 text-sm font-bold flex items-center justify-center gap-2 hover:bg-sky-600 transition-colors shadow-lg shadow-sky-100"
+             className="w-full bg-sky-500 text-white rounded-xl py-2 text-sm font-bold flex items-center justify-center gap-2 hover:bg-sky-600 transition-colors shadow-lg shadow-sky-100 dark:shadow-none"
            >
              <Save className="w-4 h-4" /> Uložit
            </button>
         </div>
       ) : (
         <>
-          <div className="relative w-20 h-28 bg-slate-50 rounded-b-3xl rounded-t-lg border-2 border-slate-200 overflow-hidden mb-4 shadow-inner">
+          <div className="relative w-20 h-28 bg-slate-100 dark:bg-slate-700/50 rounded-b-3xl rounded-t-lg border-2 border-slate-200 dark:border-slate-600 overflow-hidden mb-4 shadow-inner">
             <div 
               className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-sky-600 to-sky-400 transition-all duration-1000 ease-linear z-0"
               style={{ height: `${progress}%` }}
@@ -146,7 +146,7 @@ export default function HydrationTracker() {
             </div>
             
             <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none flex-col">
-              <span className={`font-bold text-sm ${progress > 50 ? 'text-white drop-shadow-md' : 'text-slate-500'}`}>
+              <span className={`font-bold text-sm ${progress > 50 ? 'text-white drop-shadow-md' : 'text-slate-500 dark:text-slate-400'}`}>
                 {isEmpty ? '0%' : `${Math.round(progress)}%`}
               </span>
             </div>
@@ -158,11 +158,10 @@ export default function HydrationTracker() {
               w-full py-2 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 mt-auto
               ${isEmpty 
                 ? 'bg-rose-500 hover:bg-rose-600 text-white animate-pulse' 
-                : 'bg-sky-50 text-sky-600 hover:bg-sky-100 border border-sky-200'}
+                : 'bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800'}
             `}
             title={`Přičíst ${glassSize} ml`}
           >
-            {/* Opraveno zde: jen číslo + ikonka */}
             {isEmpty ? 'NAPÍT SE!' : `${glassSize} ml`} 
             {!isEmpty && <Plus className="w-3 h-3" />}
           </button>

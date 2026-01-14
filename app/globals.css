@@ -2,8 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tvoje vlastní styly */
+:root {
+  /* --- SVĚTLÝ REŽIM (Light Mode) --- */
+  --background: #f8fafc; /* Slate-50 */
+  --foreground: #0f172a; /* Slate-900 */
+  
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  
+  --border: #e2e8f0; /* Slate-200 */
+  
+  /* Linky v poznámkách - Žlutá pro sticky note vzhled */
+  --notes-line-color: #fcd34d; 
+}
+
+.dark {
+  /* --- TMAVÝ REŽIM (Dark Mode) --- */
+  --background: #020617; /* Slate-950 */
+  --foreground: #f1f5f9; /* Slate-100 */
+  
+  --card: #0f172a; /* Slate-900 */
+  --card-foreground: #f1f5f9;
+  
+  --border: #1e293b; /* Slate-800 */
+  
+  /* Linky v poznámkách - Světlejší než pozadí (Slate-700) */
+  --notes-line-color: #334155; 
+}
+
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer components {
+  .card {
+    @apply bg-[var(--card)] text-[var(--card-foreground)] border border-[var(--border)] shadow-sm transition-colors duration-300;
+  }
+}
+
+/* Styly pro linkovaný papír */
+.notes-lines {
+  background-image: repeating-linear-gradient(
+    transparent, 
+    transparent 31px, 
+    var(--notes-line-color) 31px, 
+    var(--notes-line-color) 32px
+  );
 }
