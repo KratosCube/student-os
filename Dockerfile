@@ -2,22 +2,23 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# TOTO JE TA OPRAVA: Nainstalujeme OpenSSL a kompatibilní knihovny
+# Instalace závislostí pro systém (OpenSSL pro Prismu)
 RUN apk add --no-cache openssl libc6-compat
 
-# 1. Zkopírujeme definice závislostí
+# Instalace balíčků
 COPY package*.json ./
-
-# 2. Nainstalujeme balíčky
 RUN npm install
 
-# 3. Teď zkopírujeme ZBYTEK projektu
+# Kopírování kódu
 COPY . .
 
-# 4. Vygenerujeme Prisma klienta
+# Generování Prisma klienta
 RUN npx prisma generate
 
-# 5. Sestavíme aplikaci
+# 👇 PŘIDEJ TENTO ŘÁDEK (Falešná URL, aby build nespadl na validaci)
+ENV DATABASE_URL="file:./dev.db"
+
+# Build aplikace
 RUN npm run build
 
 EXPOSE 3000

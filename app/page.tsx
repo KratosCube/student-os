@@ -10,7 +10,7 @@ import NewExamModal from '@/components/NewExamModal';
 import RewardShop from '@/components/RewardShop';
 import HydrationTracker from '@/components/HydrationTracker';
 import QuickNotes from '@/components/QuickNotes'; // 👈 Import poznámek
-
+export const dynamic = 'force-dynamic';
 export default async function Dashboard() {
   // 1. Načtení dat
   const subjects = await prisma.subject.findMany({ include: { exams: true, sessions: true } });
