@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./prisma/dev.db:/app/prisma/dev.db
+      - ./:/app
+      - /app/node_modules
+      # Přidáme toto, aby se složka .next nepropisovala z Windows do Linuxu a nedělala bordel
+      - /app/.next 
+    environment:
+      - DATABASE_URL=file:./dev.db
+    # 👇 TOTO JE TA ZMĚNA - Spustíme vývojářský mód místo produkčního
+    command: npm run dev

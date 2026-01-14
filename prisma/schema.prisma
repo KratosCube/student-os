@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Subject {
+  id      Int            @id @default(autoincrement())
+  name    String
+  color   String         @default("#6366f1") // Hex kód barvy
+  exams   Exam[]
+  sessions StudySession[]
+}
+
+model Exam {
+  id         Int      @id @default(autoincrement())
+  date       DateTime
+  type       String   // 'confirmed' | 'potential'
+  duration   Int      @default(90) // Délka zkoušky v minutách
+  isDone     Boolean  @default(false)
+  
+  // Vazba na předmět (teď už to nebude jen text, ale odkaz)
+  subjectId  Int?
+  subject    Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  // Pro zpětnou kompatibilitu (pokud bys nechtěl vazbu)
+  legacyName String? 
+}
+
+model StudySession {
+  id        Int      @id @default(autoincrement())
+  duration  Int      // Kolik minut jsi se učil
+  createdAt DateTime @default(now())
+  
+  subjectId Int
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}

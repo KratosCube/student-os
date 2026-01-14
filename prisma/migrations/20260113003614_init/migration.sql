@@ -1,0 +1,10 @@
+-- CreateTable
+CREATE TABLE "Exam" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "subject" TEXT NOT NULL,
+    "date" DATETIME NOT NULL,
+    "type" TEXT NOT NULL,
+    "confidence" INTEGER NOT NULL DEFAULT 0,
+    "isDone" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
