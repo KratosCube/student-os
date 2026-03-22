@@ -1,22 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Droplets, Check, Settings, Save, Plus } from 'lucide-react';
+import { Droplets, Settings, Save, Plus } from 'lucide-react';
 
 export default function HydrationTracker() {
   const [progress, setProgress] = useState(100);
   const [isEmpty, setIsEmpty] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  
+
   const [totalMl, setTotalMl] = useState(0);
-  
+
   const [showSettings, setShowSettings] = useState(false);
   const [intervalMinutes, setIntervalMinutes] = useState(60);
   const [glassSize, setGlassSize] = useState(250);
 
   useEffect(() => {
     setIsMounted(true);
-    
+
     const savedInterval = localStorage.getItem('hydrationInterval');
     const savedGlassSize = localStorage.getItem('hydrationGlassSize');
     const savedTotalMl = localStorage.getItem('hydrationTotalMl');
@@ -52,7 +52,7 @@ export default function HydrationTracker() {
         setProgress(0);
         setIsEmpty(true);
       } else {
-        const percentage = 100 - (diff / currentIntervalMs * 100);
+        const percentage = 100 - (diff / currentIntervalMs) * 100;
         setProgress(Math.max(0, percentage));
         setIsEmpty(false);
       }
@@ -62,7 +62,7 @@ export default function HydrationTracker() {
     const intervalId = setInterval(updateWaterLevel, 1000);
 
     return () => clearInterval(intervalId);
-  }, [intervalMinutes]); 
+  }, [intervalMinutes]);
 
   const handleDrink = () => {
     localStorage.setItem('hydrationLastDrink', Date.now().toString());
@@ -87,92 +87,139 @@ export default function HydrationTracker() {
   if (!isMounted) return null;
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center relative overflow-hidden group h-full transition-colors">
-      
-      <div className="flex justify-between w-full mb-4 z-10 relative items-start">
+    <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-800">
+      <div className="flex items-start justify-between">
         <div>
-          <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-            <Droplets className="w-5 h-5 text-sky-500" />
+          <h3 className="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-200">
+            <Droplets className="h-5 w-5 text-sky-500" />
             Voda
           </h3>
           {!showSettings && (
-             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 font-medium">Dnes: <span className="text-sky-600 dark:text-sky-400 font-bold">{totalMl} ml</span></p>
+            <p className="mt-1 text-xs font-medium text-slate-400 dark:text-slate-500">
+              Dnes:{' '}
+              <span className="font-bold text-sky-600 dark:text-sky-400">
+                {totalMl} ml
+              </span>
+            </p>
           )}
         </div>
-        <button 
+
+        <button
           onClick={() => setShowSettings(!showSettings)}
-          className="text-slate-300 dark:text-slate-600 hover:text-sky-500 dark:hover:text-sky-400 transition-colors p-1"
+          className="p-1 text-slate-300 transition-colors hover:text-sky-500 dark:text-slate-600 dark:hover:text-sky-400"
         >
-          <Settings className="w-4 h-4" />
+          <Settings className="h-4 w-4" />
         </button>
       </div>
 
       {showSettings ? (
-        <div className="w-full flex-1 flex flex-col justify-center animate-in fade-in space-y-3">
-           <div>
-             <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 block">Interval (minuty)</label>
-             <input 
-               type="number" 
-               value={intervalMinutes}
-               onChange={(e) => setIntervalMinutes(parseInt(e.target.value) || 1)}
-               className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500"
-             />
-           </div>
-           <div>
-             <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 block">Velikost sklenice (ml)</label>
-             <input 
-               type="number" 
-               value={glassSize}
-               onChange={(e) => setGlassSize(parseInt(e.target.value) || 0)}
-               className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500"
-             />
-           </div>
-           <button 
-             onClick={saveSettings}
-             className="w-full bg-sky-500 text-white rounded-xl py-2 text-sm font-bold flex items-center justify-center gap-2 hover:bg-sky-600 transition-colors shadow-lg shadow-sky-100 dark:shadow-none"
-           >
-             <Save className="w-4 h-4" /> Uložit
-           </button>
+        <div className="mt-5 space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-bold uppercase text-slate-400 dark:text-slate-500">
+              Interval (minuty)
+            </label>
+            <input
+              type="number"
+              value={intervalMinutes}
+              onChange={(e) => setIntervalMinutes(parseInt(e.target.value) || 1)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-sky-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-bold uppercase text-slate-400 dark:text-slate-500">
+              Velikost sklenice (ml)
+            </label>
+            <input
+              type="number"
+              value={glassSize}
+              onChange={(e) => setGlassSize(parseInt(e.target.value) || 0)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-sky-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            />
+          </div>
+
+          <button
+            onClick={saveSettings}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500 py-2 text-sm font-bold text-white transition-colors hover:bg-sky-600"
+          >
+            <Save className="h-4 w-4" />
+            Uložit
+          </button>
         </div>
       ) : (
-        <>
-          <div className="relative w-20 h-28 bg-slate-100 dark:bg-slate-700/50 rounded-b-3xl rounded-t-lg border-2 border-slate-200 dark:border-slate-600 overflow-hidden mb-4 shadow-inner">
-            <div 
-              className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-sky-600 to-sky-400 transition-all duration-1000 ease-linear z-0"
+        <div className="mt-6 flex flex-col items-center">
+          <div className="relative mb-5 h-28 w-20 overflow-hidden rounded-b-3xl rounded-t-lg border-2 border-slate-200 bg-slate-100 shadow-inner dark:border-slate-600 dark:bg-slate-700/50">
+            <div
+              className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-sky-600 to-sky-400 transition-all duration-1000 ease-linear"
               style={{ height: `${progress}%` }}
             >
-              <div className="absolute -top-3 left-[-50%] w-[200%] h-6 bg-white/30 rounded-[50%] animate-wave"></div>
-              <div className="absolute -top-3 left-[-50%] w-[200%] h-6 bg-sky-400/50 rounded-[50%] animate-wave-slow" style={{top: '-5px'}}></div>
+              <div className="absolute -top-3 left-[-50%] h-6 w-[200%] rounded-[50%] bg-white/30 animate-wave" />
+              <div
+                className="absolute -top-3 left-[-50%] h-6 w-[200%] rounded-[50%] bg-sky-400/50 animate-wave-slow"
+                style={{ top: '-5px' }}
+              />
             </div>
-            
-            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none flex-col">
-              <span className={`font-bold text-sm ${progress > 50 ? 'text-white drop-shadow-md' : 'text-slate-500 dark:text-slate-400'}`}>
+
+            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+              <span
+                className={`text-sm font-bold ${
+                  progress > 50
+                    ? 'text-white drop-shadow-md'
+                    : 'text-slate-500 dark:text-slate-400'
+                }`}
+              >
                 {isEmpty ? '0%' : `${Math.round(progress)}%`}
               </span>
             </div>
           </div>
 
-          <button 
+          <button
             onClick={handleDrink}
-            className={`
-              w-full py-2 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 mt-auto
-              ${isEmpty 
-                ? 'bg-rose-500 hover:bg-rose-600 text-white animate-pulse' 
-                : 'bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800'}
-            `}
+            className={`w-full rounded-xl py-2 text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+              isEmpty
+                ? 'bg-rose-500 text-white hover:bg-rose-600 animate-pulse'
+                : 'border border-sky-200 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-400 dark:hover:bg-sky-900/50'
+            }`}
             title={`Přičíst ${glassSize} ml`}
           >
-            {isEmpty ? 'NAPÍT SE!' : `${glassSize} ml`} 
-            {!isEmpty && <Plus className="w-3 h-3" />}
+            {isEmpty ? 'NAPÍT SE!' : `${glassSize} ml`}
+            {!isEmpty && <Plus className="h-3 w-3" />}
           </button>
-        </>
+        </div>
       )}
-      
+
       <style jsx>{`
-        @keyframes wave { 0% { transform: translateX(0) rotate(0deg); } 50% { transform: translateX(-25%) rotate(5deg); } 100% { transform: translateX(0) rotate(0deg); } }
-        @keyframes wave-slow { 0% { transform: translateX(0) rotate(0deg); } 50% { transform: translateX(25%) rotate(-5deg); } 100% { transform: translateX(0) rotate(0deg); } }
-        .animate-wave { animation: wave 4s infinite ease-in-out; }
-        .animate-wave-slow { animation: wave-slow 6s infinite ease-in-out; }
+        @keyframes wave {
+          0% {
+            transform: translateX(0) rotate(0deg);
+          }
+          50% {
+            transform: translateX(-25%) rotate(5deg);
+          }
+          100% {
+            transform: translateX(0) rotate(0deg);
+          }
+        }
+
+        @keyframes wave-slow {
+          0% {
+            transform: translateX(0) rotate(0deg);
+          }
+          50% {
+            transform: translateX(25%) rotate(-5deg);
+          }
+          100% {
+            transform: translateX(0) rotate(0deg);
+          }
+        }
+
+        .animate-wave {
+          animation: wave 4s infinite ease-in-out;
+        }
+
+        .animate-wave-slow {
+          animation: wave-slow 6s infinite ease-in-out;
+        }
       `}</style>
     </div>
   );
