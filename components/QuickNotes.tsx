@@ -48,53 +48,50 @@ export default function QuickNotes() {
   if (!isMounted) return null;
 
   return (
-    // ZMĚNA POZADÍ: Žlutá (#fffbeb) pro světlý režim, Slate pro tmavý
-    <div className="bg-[#fffbeb] dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-amber-100 dark:border-slate-700 min-h-[200px] h-fit flex flex-col relative group transition-colors">
-       <div className="flex justify-between items-center mb-1">
-          <h3 className="font-bold text-amber-800 dark:text-slate-200 flex items-center gap-2 text-sm">
-            <PenLine className="w-4 h-4 text-amber-600 dark:text-indigo-400" />
-            Rychlé poznámky
-          </h3>
-          <span className="text-[10px] text-amber-600/50 dark:text-slate-500 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-            Automaticky uloženo
-          </span>
-       </div>
-       
-       <textarea 
-         ref={textareaRef}
-         value={note}
-         onChange={handleChange}
-         placeholder="Napiš si sem cokoli... (odkazy se objeví dole)"
-         rows={1}
-         // ZMĚNA TEXTU: Amber pro světlý režim, Slate pro tmavý
-         className="w-full bg-transparent border-0 resize-none focus:ring-0 focus:outline-none text-sm text-amber-900 dark:text-slate-300 placeholder-amber-900/30 dark:placeholder-slate-600 font-medium overflow-hidden block leading-[32px]"
-         style={{ 
-           // Linky berou barvu z globals.css (--notes-line-color)
-           backgroundImage: 'repeating-linear-gradient(transparent, transparent 31px, var(--notes-line-color) 31px, var(--notes-line-color) 32px)',
-           backgroundAttachment: 'local',
-           paddingTop: '0px', 
-           minHeight: '160px'
-         }}
-       />
+    <div className="ui-card relative flex min-h-[190px] h-fit flex-col p-5 transition-colors group">
+      <div className="mb-1 flex items-center justify-between">
+        <h3 className="ui-card-title flex items-center gap-2">
+          <PenLine className="h-4 w-4 text-indigo-400" />
+          Rychlé poznámky
+        </h3>
+        <span className="ui-text-helper opacity-0 transition-opacity group-hover:opacity-100">
+          Automaticky uloženo
+        </span>
+      </div>
 
-       {/* Zobrazení odkazů - ODSTRANĚNA ČÁRA (border-t) */}
-       {links.length > 0 && (
-         <div className="mt-3 pt-1 flex flex-wrap gap-2">
-           {links.map((link, i) => (
-             <a 
-               key={i}
-               href={link}
-               target="_blank"
-               rel="noopener noreferrer"
-               className="flex items-center gap-1 text-xs bg-amber-100 dark:bg-indigo-900/30 text-amber-700 dark:text-indigo-400 px-2 py-1 rounded-md hover:underline truncate max-w-full border border-amber-200 dark:border-indigo-800"
-               title={link}
-             >
-               <ExternalLink className="w-3 h-3" />
-               {new URL(link).hostname}
-             </a>
-           ))}
-         </div>
-       )}
+      <textarea
+        ref={textareaRef}
+        value={note}
+        onChange={handleChange}
+        placeholder="Napiš si sem cokoli... (odkazy se objeví dole)"
+        rows={1}
+        className="ui-textarea overflow-hidden block text-slate-700 dark:text-slate-300"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(transparent, transparent 31px, var(--notes-line-color) 31px, var(--notes-line-color) 32px)',
+          backgroundAttachment: 'local',
+          paddingTop: '0px',
+          minHeight: '150px',
+        }}
+      />
+
+      {links.length > 0 && (
+        <div className="mt-3 pt-1 flex flex-wrap gap-2">
+          {links.map((link, i) => (
+            <a
+              key={i}
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 rounded-md border border-indigo-200 bg-indigo-50 px-2 py-1 text-xs text-indigo-700 hover:underline dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300"
+              title={link}
+            >
+              <ExternalLink className="h-3 w-3" />
+              {new URL(link).hostname}
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

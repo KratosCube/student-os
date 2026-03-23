@@ -21,13 +21,9 @@ type Subject = {
 
 export default function SubjectTree({ subjects }: { subjects: Subject[] }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="ui-card p-6">
       <div className="mb-6">
-        <h3 className="text-xl font-bold">Hierarchický přehled dat</h3>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Předmět → navázané termíny → studijní session. Dobře se to obhajuje jako
-          strukturovaný pohled nad modelem.
-        </p>
+        <h3 className="ui-section-title">Hierarchický přehled dat</h3>
       </div>
 
       <div className="space-y-4">
@@ -46,7 +42,7 @@ export default function SubjectTree({ subjects }: { subjects: Subject[] }) {
                   />
                   <div>
                     <p className="font-semibold">{subject.name}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="ui-text-secondary">
                       {subject.exams.length} termínů · {subject.sessions.length} session
                     </p>
                   </div>
@@ -55,16 +51,13 @@ export default function SubjectTree({ subjects }: { subjects: Subject[] }) {
                 <div className="flex gap-2">
                   <Link
                     href={`/subjects?edit=${subject.id}`}
-                    className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+                    className="ui-btn-small ui-btn-secondary"
                   >
                     Upravit
                   </Link>
 
                   <form action={deleteSubjectAction.bind(null, subject.id)}>
-                    <button
-                      type="submit"
-                      className="rounded-xl bg-rose-600 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-700"
-                    >
+                    <button type="submit" className="ui-btn-danger">
                       Smazat
                     </button>
                   </form>
@@ -73,11 +66,11 @@ export default function SubjectTree({ subjects }: { subjects: Subject[] }) {
             </summary>
 
             <div className="mt-4 grid gap-4 xl:grid-cols-2">
-              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
+              <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-950">
                 <p className="mb-3 text-sm font-semibold">Termíny</p>
                 <div className="space-y-2 text-sm">
                   {subject.exams.length === 0 ? (
-                    <p className="text-slate-500 dark:text-slate-400">Žádné termíny</p>
+                    <p className="ui-text-secondary">Žádné termíny</p>
                   ) : (
                     subject.exams.map((exam) => (
                       <div
@@ -87,7 +80,7 @@ export default function SubjectTree({ subjects }: { subjects: Subject[] }) {
                         <p className="font-medium">
                           {new Date(exam.date).toLocaleString('cs-CZ')}
                         </p>
-                        <p className="text-slate-500 dark:text-slate-400">
+                        <p className="ui-text-secondary">
                           {exam.duration} min ·{' '}
                           {exam.type === 'confirmed' ? 'Potvrzený' : 'Možný'} ·{' '}
                           {exam.isDone ? 'Hotovo' : 'Aktivní'}
@@ -98,11 +91,11 @@ export default function SubjectTree({ subjects }: { subjects: Subject[] }) {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
+              <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-950">
                 <p className="mb-3 text-sm font-semibold">Studijní session</p>
                 <div className="space-y-2 text-sm">
                   {subject.sessions.length === 0 ? (
-                    <p className="text-slate-500 dark:text-slate-400">Žádné session</p>
+                    <p className="ui-text-secondary">Žádné session</p>
                   ) : (
                     subject.sessions.slice(0, 10).map((session) => (
                       <div
@@ -112,7 +105,7 @@ export default function SubjectTree({ subjects }: { subjects: Subject[] }) {
                         <p className="font-medium">
                           {new Date(session.createdAt).toLocaleString('cs-CZ')}
                         </p>
-                        <p className="text-slate-500 dark:text-slate-400">
+                        <p className="ui-text-secondary">
                           {session.duration} minut
                         </p>
                       </div>
@@ -125,9 +118,7 @@ export default function SubjectTree({ subjects }: { subjects: Subject[] }) {
         ))}
 
         {subjects.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Nejprve přidej alespoň jeden předmět.
-          </p>
+          <p className="ui-text-secondary">Nejprve přidej alespoň jeden předmět.</p>
         ) : null}
       </div>
     </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause, RotateCcw, Timer } from 'lucide-react';
 import { logStudySession } from '@/app/actions';
 
 type Subject = {
@@ -11,17 +11,16 @@ type Subject = {
 };
 
 export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('');
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
   const [mode, setMode] = useState<'work' | 'break'>('work');
-  
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // 1. NAČTENÍ PŘI STARTU
   useEffect(() => {
     audioRef.current = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-    
+
     const savedSubject = localStorage.getItem('timerSubject');
     if (savedSubject) setSelectedSubjectId(savedSubject);
 
@@ -36,12 +35,11 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
         setIsActive(true);
       } else {
         localStorage.removeItem('timerTarget');
-        setTimeLeft(0);
+        setTimeLeft(mode === 'work' ? 25 * 60 : 5 * 60);
       }
     }
-  }, []);
+  }, [mode]);
 
-  // 2. TIKÁNÍ
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -56,33 +54,31 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
     };
   }, [isActive, timeLeft]);
 
-  // 3. DETEKCE KONCE
   useEffect(() => {
     if (timeLeft === 0 && isActive) {
-      finishTimer();
+      void finishTimer();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeLeft, isActive]); 
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft, isActive]);
 
   const finishTimer = async () => {
     setIsActive(false);
     localStorage.removeItem('timerTarget');
-    
+
     if (audioRef.current) {
-      audioRef.current.play().catch(e => console.log("Audio chyba", e));
+      audioRef.current.play().catch(() => undefined);
     }
 
     if (mode === 'work' && selectedSubjectId) {
       try {
         await logStudySession(parseInt(selectedSubjectId), 25);
       } catch (err) {
-        console.error("Chyba při ukládání:", err);
+        console.error('Chyba při ukládání session:', err);
       }
     }
 
-    alert(mode === 'work' ? "Hotovo! 🥳 Dej si pauzu." : "Pauza končí! 🚀 Zpátky do práce.");
-    resetTimer(false); 
+    alert(mode === 'work' ? 'Hotovo! Dej si pauzu.' : 'Pauza končí. Zpátky do práce.');
+    resetTimer(false);
   };
 
   const toggleTimer = () => {
@@ -120,69 +116,87 @@ export default function FocusTimer({ subjects }: { subjects: Subject[] }) {
   };
 
   return (
-    <div className={`p-6 rounded-2xl shadow-sm border transition-colors ${
-      mode === 'work' 
-        ? 'bg-white dark:bg-slate-800 border-indigo-100 dark:border-indigo-900/30' 
-        : 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-900/50'
-    }`}>
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-          {mode === 'work' ? '🧠 Focus Mode' : '☕ Pauza'}
-        </h3>
-        <button 
-          onClick={switchMode} 
-          className="text-xs px-2 py-1 rounded bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 font-medium transition-colors"
-        >
-          {mode === 'work' ? 'Přepnout na Pauzu' : 'Přepnout na Práci'}
+    <div
+      className={`ui-card p-5 ${
+        mode === 'break'
+          ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-900/20'
+          : ''
+      }`}
+    >
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Timer className="h-5 w-5 text-indigo-500" />
+          <h3 className="ui-card-title">
+            {mode === 'work' ? 'Focus Mode' : 'Pauza'}
+          </h3>
+        </div>
+
+        <button onClick={switchMode} className="ui-btn-small ui-btn-secondary px-3 text-xs">
+          {mode === 'work' ? 'Pauza' : 'Práce'}
         </button>
       </div>
 
       {mode === 'work' && (
-        <div className="mb-6">
-          <select 
+        <div className="mb-5">
+          <select
             value={selectedSubjectId}
             onChange={(e) => setSelectedSubjectId(e.target.value)}
-            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm rounded-lg p-2.5 focus:ring-indigo-500 focus:border-indigo-500"
+            className="ui-select"
             disabled={isActive}
           >
-            <option value="">-- Vyber předmět --</option>
-            {subjects.map(s => (
-              <option key={s.id} value={s.id}>{s.name}</option>
+            <option value="">Vyber předmět</option>
+            {subjects.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
             ))}
           </select>
         </div>
       )}
 
-      <div className="text-6xl font-mono font-bold text-center mb-8 text-slate-800 dark:text-slate-100 tracking-tighter">
-        {formatTime(timeLeft)}
+      <div className="mb-6 text-center">
+        <div className="text-6xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          {formatTime(timeLeft)}
+        </div>
       </div>
 
-      <div className="flex justify-center gap-4">
-        <button 
+      <div className="flex items-center justify-center gap-3">
+        <button
           onClick={toggleTimer}
           disabled={mode === 'work' && !selectedSubjectId && !isActive}
-          className={`px-8 py-3 rounded-xl text-white font-bold text-lg shadow-lg transition-transform active:scale-95 flex items-center gap-2 ${
-            isActive 
-              ? 'bg-amber-500 hover:bg-amber-600' 
-              : (!selectedSubjectId && mode === 'work') 
-                ? 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed' 
-                : 'bg-indigo-600 hover:bg-indigo-700'
+          className={`inline-flex h-12 min-w-[128px] items-center justify-center gap-2 rounded-xl px-5 text-lg font-semibold transition-colors ${
+            isActive
+              ? 'bg-amber-500 text-white hover:bg-amber-600'
+              : !selectedSubjectId && mode === 'work'
+              ? 'cursor-not-allowed bg-slate-300 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+              : 'bg-indigo-600 text-white hover:bg-indigo-700'
           }`}
         >
-          {isActive ? <><Pause size={20}/> Pauza</> : <><Play size={20}/> Start</>}
+          {isActive ? (
+            <>
+              <Pause className="h-5 w-5" />
+              Pauza
+            </>
+          ) : (
+            <>
+              <Play className="h-5 w-5" />
+              Start
+            </>
+          )}
         </button>
-        
-        <button 
+
+        <button
           onClick={() => resetTimer(true)}
-          className="p-3 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+          aria-label="Resetovat timer"
         >
-          <RotateCcw size={24} />
+          <RotateCcw className="h-5 w-5" />
         </button>
       </div>
 
-      {!selectedSubjectId && mode === 'work' && (
-        <p className="text-center text-xs text-rose-500 dark:text-rose-400 mt-4 font-medium">
-          ⚠️ Vyber předmět pro start.
+      {mode === 'work' && !selectedSubjectId && (
+        <p className="mt-4 text-center text-sm font-medium text-amber-600 dark:text-rose-400">
+          Vyber předmět pro start.
         </p>
       )}
     </div>

@@ -3,51 +3,206 @@
 @tailwind utilities;
 
 :root {
-  /* --- SVĚTLÝ REŽIM (Light Mode) --- */
-  --background: #f8fafc; /* Slate-50 */
-  --foreground: #0f172a; /* Slate-900 */
-  
+  --background: #f5f7fb;
+  --foreground: #0f172a;
+
   --card: #ffffff;
   --card-foreground: #0f172a;
-  
-  --border: #e2e8f0; /* Slate-200 */
-  
-  /* Linky v poznámkách - Žlutá pro sticky note vzhled */
-  --notes-line-color: #fcd34d; 
+
+  --border: #e2e8f0;
+
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-foreground: #ffffff;
+
+  --danger: #f43f5e;
+  --danger-hover: #e11d48;
+
+  --surface-2: #f8fafc;
+  --surface-3: #eef2ff;
+
+  --notes-line-color: #e6d37a;
 }
 
 .dark {
-  /* --- TMAVÝ REŽIM (Dark Mode) --- */
-  --background: #020617; /* Slate-950 */
-  --foreground: #f1f5f9; /* Slate-100 */
-  
-  --card: #0f172a; /* Slate-900 */
-  --card-foreground: #f1f5f9;
-  
-  --border: #1e293b; /* Slate-800 */
-  
-  /* Linky v poznámkách - Světlejší než pozadí (Slate-700) */
-  --notes-line-color: #334155; 
+  --background: #020617;
+  --foreground: #f8fafc;
+
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+
+  --border: #1e293b;
+
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-foreground: #ffffff;
+
+  --danger: #f43f5e;
+  --danger-hover: #fb7185;
+
+  --surface-2: #111827;
+  --surface-3: #172033;
+
+  --notes-line-color: #334155;
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 @layer components {
-  .card {
-    @apply bg-[var(--card)] text-[var(--card-foreground)] border border-[var(--border)] shadow-sm transition-colors duration-300;
+  .ui-card {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
+    @apply rounded-2xl shadow-sm;
+  }
+
+  .ui-card-soft {
+    background-color: var(--surface-2);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
+    @apply rounded-2xl;
+  }
+
+  .ui-eyebrow {
+    color: var(--primary);
+    @apply text-[11px] font-semibold uppercase tracking-[0.22em];
+  }
+
+  .ui-page-title {
+    @apply text-3xl font-bold tracking-tight md:text-[2.15rem];
+  }
+
+  .ui-section-title {
+    @apply text-xl font-bold tracking-tight md:text-2xl;
+  }
+
+  .ui-card-title {
+    @apply text-lg font-semibold tracking-tight;
+  }
+
+  .ui-metric-label {
+    @apply text-sm font-medium;
+    color: var(--text-secondary);
+  }
+
+  .ui-metric-value {
+    @apply text-2xl font-bold tracking-tight md:text-3xl;
+  }
+
+  .ui-text-secondary {
+    color: var(--text-secondary);
+    @apply text-sm leading-6;
+  }
+
+  .ui-text-muted {
+    color: var(--text-muted);
+    @apply text-sm leading-6;
+  }
+
+  .ui-text-helper {
+    color: var(--text-muted);
+    @apply text-xs leading-5;
+  }
+
+  .ui-label {
+    @apply mb-2 block text-sm font-medium;
+  }
+
+  .ui-input {
+    background-color: var(--background);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    @apply h-11 w-full rounded-xl px-4 text-base outline-none transition-colors;
+  }
+
+  .ui-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .ui-input:focus {
+    border-color: var(--primary);
+  }
+
+  .ui-select {
+    background-color: var(--background);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    @apply h-11 w-full rounded-xl px-4 text-base outline-none transition-colors;
+  }
+
+  .ui-select:focus {
+    border-color: var(--primary);
+  }
+
+  .ui-textarea {
+    background-color: transparent;
+    color: var(--foreground);
+    @apply w-full resize-none border-0 text-sm leading-8 outline-none;
+  }
+
+  .ui-textarea::placeholder {
+    color: var(--text-muted);
+  }
+
+  .ui-btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    @apply inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold transition-colors;
+  }
+
+  .ui-btn-primary:hover {
+    background-color: var(--primary-hover);
+  }
+
+  .ui-btn-secondary {
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
+    @apply inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold transition-colors;
+  }
+
+  .ui-btn-secondary:hover {
+    background-color: var(--surface-2);
+  }
+
+  .ui-btn-danger {
+    background-color: var(--danger);
+    color: white;
+    @apply inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-semibold transition-colors;
+  }
+
+  .ui-btn-danger:hover {
+    background-color: var(--danger-hover);
+  }
+
+  .ui-btn-small {
+    @apply inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-semibold;
+  }
+
+  .ui-badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
   }
 }
 
-/* Styly pro linkovaný papír */
 .notes-lines {
   background-image: repeating-linear-gradient(
-    transparent, 
-    transparent 31px, 
-    var(--notes-line-color) 31px, 
+    transparent,
+    transparent 31px,
+    var(--notes-line-color) 31px,
     var(--notes-line-color) 32px
   );
 }

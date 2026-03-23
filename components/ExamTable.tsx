@@ -14,113 +14,104 @@ type Exam = {
   } | null;
 };
 
+function formatDate(date: Date | string) {
+  const d = new Date(date);
+  return d.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function formatTime(date: Date | string) {
+  const d = new Date(date);
+  return d.toLocaleTimeString('cs-CZ', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export default function ExamTable({ exams }: { exams: Exam[] }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-4">
-        <h3 className="text-xl font-bold">Tabulka termínů</h3>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Smysluplná tabulka nad datovým modelem – ne jen seznam tlačítek.
-        </p>
+    <div className="ui-card w-full p-6">
+      <div className="mb-5">
+        <h3 className="ui-section-title">Tabulka termínů</h3>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-y-2">
-          <thead>
-            <tr className="text-left text-sm text-slate-500 dark:text-slate-400">
-              <th className="px-4 py-2">Předmět</th>
-              <th className="px-4 py-2">Datum</th>
-              <th className="px-4 py-2">Typ</th>
-              <th className="px-4 py-2">Délka</th>
-              <th className="px-4 py-2">Stav</th>
-              <th className="px-4 py-2">Akce</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {exams.map((exam) => (
-              <tr
-                key={exam.id}
-                className="rounded-2xl bg-slate-50 text-sm dark:bg-slate-950"
-              >
-                <td className="rounded-l-2xl px-4 py-4">
+      {exams.length === 0 ? (
+        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-10 text-center text-slate-600 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-400">
+          Zatím nejsou žádné termíny.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {exams.map((exam) => (
+            <div
+              key={exam.id}
+              className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950/60"
+            >
+              <div className="grid gap-4 md:grid-cols-[minmax(160px,1fr)_auto_64px_120px] md:items-center">
+                <div className="min-w-0">
                   <div className="flex items-center gap-3">
                     <span
-                      className="h-3 w-3 rounded-full"
+                      className="h-3 w-3 shrink-0 rounded-full"
                       style={{ backgroundColor: exam.subject?.color ?? '#6366f1' }}
                     />
-                    <span className="font-semibold">{exam.subject?.name ?? 'Bez předmětu'}</span>
+                    <span className="truncate text-base font-semibold text-slate-800 dark:text-slate-100">
+                      {exam.subject?.name ?? 'Bez předmětu'}
+                    </span>
                   </div>
-                </td>
 
-                <td className="px-4 py-4">
-                  {new Date(exam.date).toLocaleString('cs-CZ')}
-                </td>
+                  <div className="mt-2 pl-6 text-sm leading-5 text-slate-500 dark:text-slate-400">
+                    <div>{formatDate(exam.date)}</div>
+                    <div>{formatTime(exam.date)}</div>
+                  </div>
+                </div>
 
-                <td className="px-4 py-4">
-                  <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold dark:bg-slate-900">
+                <div className="flex flex-wrap gap-2">
+                  <span className="ui-badge bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                     {exam.type === 'confirmed' ? 'Potvrzeno' : 'Možný'}
                   </span>
-                </td>
 
-                <td className="px-4 py-4">{exam.duration} min</td>
-
-                <td className="px-4 py-4">
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    className={`ui-badge ${
                       exam.isDone
-                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'
-                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300'
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
                     }`}
                   >
                     {exam.isDone ? 'Hotovo' : 'Aktivní'}
                   </span>
-                </td>
+                </div>
 
-                <td className="rounded-r-2xl px-4 py-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Link
-                      href={`/planner?edit=${exam.id}`}
-                      className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold hover:bg-white dark:border-slate-700 dark:hover:bg-slate-900"
-                    >
-                      Upravit
-                    </Link>
+                <div className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  {exam.duration} min
+                </div>
 
-                    <form action={toggleExamAction.bind(null, exam.id, exam.isDone)}>
-                      <button
-                        className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold hover:bg-white dark:border-slate-700 dark:hover:bg-slate-900"
-                        type="submit"
-                      >
-                        Přepnout stav
-                      </button>
-                    </form>
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href={`/planner?edit=${exam.id}`}
+                    className="ui-btn-small ui-btn-secondary w-full"
+                  >
+                    Upravit
+                  </Link>
 
-                    <form action={deleteExamAction.bind(null, exam.id)}>
-                      <button
-                        className="rounded-xl bg-rose-600 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-700"
-                        type="submit"
-                      >
-                        Smazat
-                      </button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  <form action={toggleExamAction.bind(null, exam.id, exam.isDone)}>
+                    <button className="ui-btn-small ui-btn-secondary w-full" type="submit">
+                      Přepnout stav
+                    </button>
+                  </form>
 
-            {exams.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="rounded-2xl bg-slate-50 px-4 py-10 text-center text-sm text-slate-500 dark:bg-slate-950 dark:text-slate-400"
-                >
-                  Zatím nejsou žádné termíny.
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
-      </div>
+                  <form action={deleteExamAction.bind(null, exam.id)}>
+                    <button className="ui-btn-danger w-full" type="submit">
+                      Smazat
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

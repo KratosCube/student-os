@@ -20,7 +20,7 @@ export default function MainNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-2">
+    <nav className="space-y-1.5">
       {items.map((item) => {
         const Icon = item.icon;
         const active = pathname === item.href;
@@ -30,10 +30,10 @@ export default function MainNav() {
             key={item.href}
             href={item.href}
             className={[
-              'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-colors',
+              'flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-medium transition-colors',
               active
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-white text-slate-700 hover:bg-slate-100 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800',
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800/70',
             ].join(' ')}
           >
             <Icon className="h-4 w-4" />

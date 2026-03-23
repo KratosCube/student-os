@@ -1,14 +1,13 @@
 'use client';
 
-import { useActionState, useEffect, useMemo, useRef } from 'react';
+import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 
-import {
-  addExamAction,
-  updateExamAction,
-} from '@/app/actions';
+import { addExamAction, updateExamAction } from '@/app/actions';
 import { INITIAL_FORM_STATE } from '@/lib/form-state';
+
 type Subject = {
   id: number;
   name: string;
@@ -22,13 +21,26 @@ type ExamWithSubject = {
   duration: number;
 };
 
-function toDatetimeLocalValue(date: Date | string | null | undefined) {
-  if (!date) return '';
+function splitDateTimeValue(date: Date | string | null | undefined) {
+  if (!date) {
+    return { datePart: '', hourPart: '08', minutePart: '00' };
+  }
 
   const value = new Date(date);
   const timezoneOffset = value.getTimezoneOffset() * 60_000;
-  return new Date(value.getTime() - timezoneOffset).toISOString().slice(0, 16);
+  const local = new Date(value.getTime() - timezoneOffset).toISOString().slice(0, 16);
+  const [datePart, timePart] = local.split('T');
+  const [hourPart, minutePart] = (timePart ?? '08:00').split(':');
+
+  return {
+    datePart: datePart ?? '',
+    hourPart: hourPart ?? '08',
+    minutePart: minutePart ?? '00',
+  };
 }
+
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES = ['00', '15', '30', '45'];
 
 export default function PlannerExamForm({
   subjects,
@@ -39,6 +51,21 @@ export default function PlannerExamForm({
 }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+
+  const initialParts = useMemo(
+    () => splitDateTimeValue(selectedExam?.date),
+    [selectedExam],
+  );
+
+  const [datePart, setDatePart] = useState(initialParts.datePart);
+  const [hourPart, setHourPart] = useState(initialParts.hourPart);
+  const [minutePart, setMinutePart] = useState(initialParts.minutePart);
+
+  useEffect(() => {
+    setDatePart(initialParts.datePart);
+    setHourPart(initialParts.hourPart);
+    setMinutePart(initialParts.minutePart);
+  }, [initialParts]);
 
   const action = useMemo(
     () => (selectedExam ? updateExamAction : addExamAction),
@@ -56,69 +83,119 @@ export default function PlannerExamForm({
     }
 
     formRef.current?.reset();
+    setDatePart('');
+    setHourPart('08');
+    setMinutePart('00');
     router.refresh();
   }, [state.success, selectedExam, router]);
 
+  const combinedDateTime =
+    datePart && hourPart && minutePart ? `${datePart}T${hourPart}:${minutePart}` : '';
+
   return (
-    <div className="h-fit rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="ui-card h-fit p-6">
       <div className="mb-6">
-        <h3 className="text-xl font-bold">
+        <h3 className="ui-section-title">
           {selectedExam ? 'Upravit termín' : 'Přidat nový termín'}
         </h3>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Formulář má plnou validaci a dává smysl jako samostatná pracovní plocha.
-        </p>
       </div>
 
       <form ref={formRef} action={formAction} className="space-y-4">
         {selectedExam ? <input type="hidden" name="examId" value={selectedExam.id} /> : null}
+        <input type="hidden" name="date" value={combinedDateTime} readOnly />
 
         <div>
-          <label className="mb-1 block text-sm font-semibold">Předmět</label>
-          <select
-            name="subjectId"
-            defaultValue={selectedExam?.subjectId ?? ''}
-            className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-950"
-          >
-            <option value="">Vyber předmět</option>
-            {subjects.map((subject) => (
-              <option key={subject.id} value={subject.id}>
-                {subject.name}
-              </option>
-            ))}
-          </select>
+          <label className="ui-label">Předmět</label>
+          <div className="relative">
+            <select
+              name="subjectId"
+              defaultValue={selectedExam?.subjectId ?? ''}
+              className="ui-select appearance-none pr-10"
+            >
+              <option value="">Vyber předmět</option>
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          </div>
           {state.errors.subjectId ? (
-            <p className="mt-1 text-sm text-rose-500">{state.errors.subjectId}</p>
+            <p className="mt-2 text-sm font-medium text-rose-400">
+              {state.errors.subjectId}
+            </p>
           ) : null}
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold">Datum a čas</label>
+          <label className="ui-label">Datum</label>
           <input
-            name="date"
-            type="datetime-local"
-            defaultValue={toDatetimeLocalValue(selectedExam?.date)}
-            className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-950"
+            type="date"
+            value={datePart}
+            onChange={(e) => setDatePart(e.target.value)}
+            className="ui-input"
           />
+        </div>
+
+        <div>
+          <label className="ui-label">Čas</label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="relative">
+              <select
+                value={hourPart}
+                onChange={(e) => setHourPart(e.target.value)}
+                className="ui-select appearance-none pr-10"
+              >
+                {HOURS.map((hour) => (
+                  <option key={hour} value={hour}>
+                    {hour}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            </div>
+
+            <div className="relative">
+              <select
+                value={minutePart}
+                onChange={(e) => setMinutePart(e.target.value)}
+                className="ui-select appearance-none pr-10"
+              >
+                {MINUTES.map((minute) => (
+                  <option key={minute} value={minute}>
+                    {minute}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            </div>
+          </div>
+
           {state.errors.date ? (
-            <p className="mt-1 text-sm text-rose-500">{state.errors.date}</p>
+            <p className="mt-2 text-sm font-medium text-rose-400">
+              {state.errors.date}
+            </p>
           ) : null}
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold">Typ termínu</label>
-          <select
-            name="type"
-            defaultValue={selectedExam?.type ?? 'confirmed'}
-            className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-950"
-          >
-            <option value="confirmed">Potvrzený</option>
-            <option value="potential">Možný</option>
-          </select>
+          <label className="ui-label">Typ termínu</label>
+          <div className="relative">
+            <select
+              name="type"
+              defaultValue={selectedExam?.type ?? 'confirmed'}
+              className="ui-select appearance-none pr-10"
+            >
+              <option value="confirmed">Potvrzený</option>
+              <option value="potential">Možný</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          </div>
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-semibold">Délka (min)</label>
+          <label className="ui-label">Délka (min)</label>
           <input
             name="duration"
             type="number"
@@ -126,10 +203,12 @@ export default function PlannerExamForm({
             max={480}
             step={15}
             defaultValue={selectedExam?.duration ?? 90}
-            className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-950"
+            className="ui-input"
           />
           {state.errors.duration ? (
-            <p className="mt-1 text-sm text-rose-500">{state.errors.duration}</p>
+            <p className="mt-2 text-sm font-medium text-rose-400">
+              {state.errors.duration}
+            </p>
           ) : null}
         </div>
 
@@ -137,8 +216,8 @@ export default function PlannerExamForm({
           <p
             className={`rounded-2xl px-4 py-3 text-sm ${
               state.success
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'
-                : 'bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-300'
+                ? 'bg-emerald-900/20 text-emerald-300'
+                : 'bg-rose-900/20 text-rose-300'
             }`}
           >
             {state.message}
@@ -146,19 +225,12 @@ export default function PlannerExamForm({
         ) : null}
 
         <div className="flex gap-3">
-          <button
-            disabled={isPending}
-            type="submit"
-            className="rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
-          >
+          <button disabled={isPending} type="submit" className="ui-btn-primary">
             {selectedExam ? 'Uložit změny' : 'Přidat termín'}
           </button>
 
           {selectedExam ? (
-            <Link
-              href="/planner"
-              className="rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
-            >
+            <Link href="/planner" className="ui-btn-secondary">
               Zrušit editaci
             </Link>
           ) : null}

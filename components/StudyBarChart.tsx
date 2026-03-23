@@ -17,17 +17,15 @@ export default function StudyBarChart({
   const columns = Math.max(items.length, 1);
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-6">
-        <h3 className="text-lg font-bold">{title}</h3>
+    <div className="ui-card p-6">
+      <div className="mb-5">
+        <h3 className="ui-section-title">{title}</h3>
         {description ? (
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            {description}
-          </p>
+          <p className="ui-text-secondary mt-2">{description}</p>
         ) : null}
       </div>
 
-      <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950 overflow-hidden">
+      <div className="overflow-hidden rounded-xl bg-slate-100 px-4 py-5 dark:bg-slate-950">
         <div
           className="grid items-end gap-3"
           style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
@@ -37,13 +35,13 @@ export default function StudyBarChart({
 
             return (
               <div key={item.label} className="min-w-0">
-                <div className="mb-3 text-center text-xs font-medium text-slate-500 dark:text-slate-400">
+                <div className="mb-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300">
                   {item.value} min
                 </div>
 
-                <div className="flex h-[220px] items-end justify-center">
+                <div className="flex h-[210px] items-end justify-center">
                   <div
-                    className="w-full max-w-[56px] rounded-t-2xl transition-all duration-500"
+                    className="w-full max-w-[50px] rounded-t-xl transition-all duration-500"
                     style={{
                       height: `${Math.max(heightPercent, item.value > 0 ? 8 : 0)}%`,
                       backgroundColor: item.color ?? '#6366f1',
@@ -51,7 +49,7 @@ export default function StudyBarChart({
                   />
                 </div>
 
-                <div className="mt-3 truncate text-center text-sm font-medium text-slate-700 dark:text-slate-300">
+                <div className="mt-3 truncate text-center text-sm font-medium text-slate-700 dark:text-slate-200">
                   {item.label}
                 </div>
               </div>

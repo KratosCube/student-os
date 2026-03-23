@@ -40,10 +40,8 @@ export default function StudyChartSwitcher({
         <button
           type="button"
           onClick={() => setMode('week')}
-          className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${
-            mode === 'week'
-              ? 'bg-indigo-600 text-white'
-              : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800'
+          className={`${
+            mode === 'week' ? 'ui-btn-primary' : 'ui-btn-secondary'
           }`}
         >
           Po dnech
@@ -52,10 +50,8 @@ export default function StudyChartSwitcher({
         <button
           type="button"
           onClick={() => setMode('subjects')}
-          className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${
-            mode === 'subjects'
-              ? 'bg-indigo-600 text-white'
-              : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800'
+          className={`${
+            mode === 'subjects' ? 'ui-btn-primary' : 'ui-btn-secondary'
           }`}
         >
           Podle předmětů
