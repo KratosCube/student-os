@@ -156,4 +156,4 @@ export default function GoalTracker({ todayMinutes }: { todayMinutes: number }) 
       )}
     </div>
   );
-}
+} 

@@ -26,16 +26,18 @@ export default async function PlannerPage({ searchParams }: PlannerPageProps) {
   const selectedExam = exams.find((exam) => exam.id === editId) ?? null;
 
   return (
-    <div className="max-w-[1044px] space-y-5">
-      <section className="ui-card p-6">
-        <p className="ui-eyebrow">Planner</p>
-        <h2 className="ui-page-title mt-2">Správa zkoušek a termínů</h2>
-      </section>
+  <div className="w-full space-y-5">
+    <section className="ui-card p-6">
+      <p className="ui-eyebrow">Planner</p>
+      <h2 className="ui-page-title mt-2">Správa zkoušek a termínů</h2>
+    </section>
 
-      <div className="grid items-start gap-6 xl:grid-cols-[360px_660px]">
-        <PlannerExamForm subjects={subjects} selectedExam={selectedExam} />
+    <div className="grid items-start gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+      <PlannerExamForm subjects={subjects} selectedExam={selectedExam} />
+      <div className="min-w-0">
         <ExamTable exams={exams} />
       </div>
     </div>
-  );
+  </div>
+);
 }
